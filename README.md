@@ -52,4 +52,4 @@ dev-resources/
 │       └── ferramentas.json       # Arquivo de dados / Mock dos utilitários
 ├── public/
 ├── package.json
-└── README.md
+└─ README.md
