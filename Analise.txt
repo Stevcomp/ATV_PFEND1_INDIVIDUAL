@@ -1,0 +1,13 @@
+Sim. Fiz uma análise e não removi nada. Estes itens parecem dispensáveis para o funcionamento atual:
+
+- page.module.css (/C:/Users/25254180/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/app/page.module.css): não é importado pela página inicial atual; parece conter estilos antigos do catálogo.
+- A dependência bootstrap em package.json (/C:/Users/25254180/Documents/ATV_PFEND1_INDIVIDUAL/frontend/package.json): não encontrei uso no código; o projeto usa CSS próprio.
+- Os SVGs padrão em public (next.svg, vercel.svg, window.svg, globe.svg e file.svg): não encontrei referências a eles.
+- As regras <style jsx> de largura dos formulários de nova ferramenta e edição: repetem o mesmo estilo e poderiam ficar numa folha CSS.
+
+Há também dois pontos para revisar, sem apagar automaticamente:
+
+- O README do backend (/C:/Users/25254180/Documents/ATV_PFEND1_INDIVIDUAL/backend/README.md) aponta para um nome de migração que não corresponde ao arquivo atual.
+- O banco ainda tem a tabela antiga produtos, preservada na migração. Ela não é usada pelo sistema novo; antes de removê-la, vale confirmar que não há dados importantes.
+
+Os arquivos de rotas, controllers, services, models, api.js, auth.js e scripts/check.js estão conectados ao funcionamento atual.
