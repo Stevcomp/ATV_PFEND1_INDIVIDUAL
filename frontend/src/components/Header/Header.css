@@ -1,0 +1,12 @@
+.site-header { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--border-color); background: #ffffffed; backdrop-filter: blur(12px); }
+.header-container { width: min(1200px, 100%); min-height: 68px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; color: var(--text-main); font-size: 1.23rem; font-weight: 800; letter-spacing: -.04em; white-space: nowrap; }
+.brand-mark { color: var(--primary-color); }
+.brand-manager { color: var(--text-muted); font-size: .83rem; font-weight: 650; letter-spacing: 0; }
+.header-nav { display: flex; align-items: center; gap: 18px; color: var(--text-muted); font-size: .9rem; font-weight: 650; }
+.header-nav a:hover, .header-logout:hover { color: var(--primary-color); }
+.header-greeting { color: var(--text-main); }
+.header-logout { padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: white; color: var(--text-main); font-weight: 700; cursor: pointer; }
+.header-signup { padding: 9px 13px; border-radius: 8px; background: var(--primary-color); color: white !important; }
+.header-signup:hover { background: #1D4ED8; }
+@media (max-width: 620px) { .header-container { padding: 0 16px; min-height: 62px; } .brand-manager { display: none; } .header-nav { gap: 11px; font-size: .84rem; } .header-greeting { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
