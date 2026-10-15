@@ -1,17 +1,16 @@
-.tool-card { min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 22px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--surface-color); box-shadow: 0 5px 18px #0f172a08; transition: transform .16s ease, box-shadow .16s ease; }
+﻿.tool-card { min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 22px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--surface-color); box-shadow: 0 5px 18px #0f172a08; transition: transform .16s ease, box-shadow .16s ease; }
 .tool-card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px #0f172a10; }
 .tool-card-top, .tool-card-title, .tool-card-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .tool-category { overflow: hidden; max-width: 70%; padding: 5px 10px; border-radius: 20px; background: #EFF6FF; color: var(--primary-color); font-size: .76rem; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
-.tool-license, .tool-type { color: var(--text-muted); font-size: .77rem; }
+.tool-type { color: var(--text-muted); font-size: .77rem; }
 .tool-card-title { align-items: flex-start; }
 .tool-card-title h2 { font-size: 1.22rem; letter-spacing: -.025em; }
 .tool-type { display: block; margin-top: 4px; }
 .tool-icon { display: grid; flex: 0 0 34px; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: #F1F5F9; color: var(--primary-color); font-size: 1.1rem; }
 .tool-description { min-height: 3em; color: var(--text-muted); font-size: .92rem; line-height: 1.55; }
-.tool-tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
-.tool-tags li { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-muted); font-size: .72rem; }
 .tool-card-bottom { align-items: flex-end; flex-wrap: wrap; margin-top: auto; padding-top: 4px; }
 .tool-author { color: var(--text-muted); font-size: .76rem; }
 .tool-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .tool-actions .button { min-height: 36px; padding: 8px 11px; font-size: .8rem; }
 .tool-actions .access-button { flex-basis: 100%; }
+

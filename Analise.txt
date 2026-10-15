@@ -1,6 +1,23 @@
-﻿Arquivos desnecessários para o funcionamento do back-end original (CRUD de produtos)
+﻿1. backend/controllers/FerramentaController.js e backend/routes/ferramentaRoutes.js — já cobrem listagem, consulta e cadastro. O front-end também espera edição e exclusão, então esses endpoints precisam ser incluídos.
+2. frontend/src/services/api.js e frontend/src/services/auth.js — não estão presentes, mas as páginas do front-end os importam para chamar a API e gerenciar a sessão local.
+ALTERAÇÕES EM backend/models/FerramentaModel.js
 
+BASE DO PROFESSOR APLICADA EM backend/app.js
 
+- A estrutura enviada foi adaptada uma vez (o exemplo da mensagem estava duplicado).
+- `app` agora é criado e exportado como `export const app = express()` para ser importado pelo `server.js`.
+- O middleware `express.json()` permanece para permitir que o Express leia corpos JSON.
+- A criação do pool e a ligação model -> service -> controller -> routes foram mantidas, usando nomes `Ferramenta` em vez de `Produto`.
+- A rota de verificação `/api/check` foi adicionada.
+- A rota principal foi ajustada para `/api/ferramentas`; CORS não foi incluído, conforme combinado.
+- O handler 404 agora informa método e caminho requisitados; o handler de erros mantém o formato geral do exemplo do professor.
+- O serviço ainda precisa ser alinhado aos campos atuais da entidade antes das operações do CRUD funcionarem corretamente.
 
-Observação: package-lock.json não é necessário enquanto a API está rodando, mas é útil para instalar versões reproduzíveis das dependências. 
-A migração SQL é necessária para criar a tabela no banco na configuração inicial. Os arquivos ProdutoController.js, produtoRoutes.js, ProdutoService.js, Produto.js e ProdutoModels.js pertencem ao fluxo do CRUD de produtos e não foram classificados como desnecessários.
+TABELAS DO BANCO E REMOÇÃO DE LICENÇA/TAGS DO FRONT-END
+
+- A migração `backend/migrations/20260928_1627_criar_tabela_ferramentas.sql` agora cria duas tabelas simples: `usuarios` (id, nome, email, senha) e `ferramentas` (id, nome, categoria, tipo, descricao, link, usuario_id). `usuario_id` referencia `usuarios.id`.
+- O formulário de ferramentas não exibe nem envia mais `licenca` ou `tags`.
+- O card não exibe mais licença ou tags, e a busca da página inicial não inclui tags nem menciona tags no placeholder.
+- Removi os estilos de licença/tags que ficaram sem uso.
+- A migração usa `CREATE TABLE IF NOT EXISTS`: ela cria as tabelas quando não existem, mas não altera tabelas antigas já criadas. Não executei o SQL no banco.
+

@@ -1,8 +1,8 @@
-export function criarProdutoController({ produtoService }) {
+﻿export function criarFerramentaController({ ferramentaService }) {
     async function listar(req, res, next) {
         try {
-            const produtos = await produtoService.listar();
-            res.status(200).json({ sucesso: true, dados: produtos });
+            const ferramentas = await ferramentaService.listar();
+            res.status(200).json({ sucesso: true, dados: ferramentas });
         } catch (erro) {
             next(erro);
         }
@@ -10,8 +10,8 @@ export function criarProdutoController({ produtoService }) {
 
     async function buscar(req, res, next) {
         try {
-            const produto = await produtoService.buscarPorId(req.params.id);
-            res.status(200).json({ sucesso: true, dados: produto })
+            const ferramenta = await ferramentaService.buscarPorId(req.params.id);
+            res.status(200).json({ sucesso: true, dados: ferramenta })
         } catch (erro) {
             if (erro instanceof TypeError) 
                 return res.status(400).json({ erro: erro.message });
@@ -23,8 +23,8 @@ export function criarProdutoController({ produtoService }) {
 
     async function criar(req, res, next) {
         try {
-            const produtoNovo = await produtoService.criar(req.body);
-            res.status(201).json({ sucesso: true, dados: produtoNovo });
+            const ferramentaNovo = await ferramentaService.criar(req.body);
+            res.status(201).json({ sucesso: true, dados: ferramentaNovo });
         } catch (erro) {
             res.status(400).json({ sucesso: false, erro: erro.message });
         }

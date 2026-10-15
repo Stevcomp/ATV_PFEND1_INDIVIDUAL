@@ -1,42 +1,41 @@
 ﻿# DevResources Manager
 
-Projeto dividido em um front-end Next.js para um catálogo de ferramentas e um back-end Express/MySQL. No estado atual, as duas partes ainda não estão integradas: o front-end apresenta páginas de ferramentas e usuários, enquanto o back-end contém arquivos-base de CRUD de produtos. O servidor ainda referencia módulos de ferramentas e usuários que não estão presentes, e as rotas de produtos não estão registradas nele.
+Projeto com um front-end Next.js para um catálogo de ferramentas e uma API em Express/MySQL. O código está em processo de alinhamento: as páginas do front-end tratam ferramentas e usuários, e o back-end contém a base do CRUD de ferramentas.
 
 ## Tecnologias
 
 - Front-end: Next.js, React e CSS.
 - Back-end: Node.js, Express e MySQL (`mysql2`).
-- `bcryptjs` está listado nas dependências do back-end para uso com senhas.
 
-## Estrutura atual
+## Estrutura
 
 ```text
 backend/
-  config/       configuração do ambiente e conexão MySQL
-  controllers/  controller do CRUD de produtos
-  migrations/  script SQL da tabela de produtos
-  models/       entidade e consultas de produtos
-  routes/       rotas de produtos
-  services/     regras do CRUD de produtos
-  server.js     inicialização da API (ainda referencia módulos ausentes)
+  app.js         configuração do Express, middlewares e rotas
+  config/        configuração do ambiente e conexão MySQL
+  controllers/   tratamento das requisições de ferramentas
+  migrations/    criação da tabela ferramentas
+  models/        entidade e consultas de ferramentas
+  routes/        endpoints de ferramentas
+  services/      regras do CRUD de ferramentas
+  server.js      carregamento do ambiente e inicialização do servidor
 
 frontend/src/
-  app/          páginas, layout e estilos
-  components/   componentes de interface
+  app/           páginas, layout e estilos
+  components/    Header, CardFerramenta e FormFerramenta
 ```
 
-## Estado de funcionamento
+## Estado atual e integração
 
-O back-end ainda não inicia corretamente: `backend/server.js` importa módulos de usuários e ferramentas que não existem atualmente. Além disso, ele não registra `produtoRoutes.js`; portanto, o CRUD de produtos não está acessível por meio do servidor atual.
+O `server.js` segue o padrão de inicialização indicado pelo professor e inicia a aplicação definida em `backend/app.js`. Atualmente, `app.js` registra as rotas `/api/ferramentas`, mas cadastro e login de usuários ainda não estão implementados. As rotas atuais de ferramentas permitem listar, consultar por ID e cadastrar; o front-end também espera edição e exclusão.
 
-As páginas do front-end também esperam chamadas para a API de ferramentas e usuários, mas a pasta `frontend/src/services` não está presente. Assim, a integração entre as páginas e a API precisa ser concluída antes de executar o sistema completo.
+As páginas do front-end esperam funções de comunicação com a API em `frontend/src/services`, pasta que não está presente. A migração define as tabelas `usuarios` e `ferramentas`, com `usuario_id` ligado ao autor. O formulário e o card usam os campos `nome`, `categoria`, `tipo`, `descricao` e `link`. O serviço ainda precisa ser alinhado ao model para que o CRUD funcione.
 
 ## Configuração do banco
 
-O back-end exige um banco MySQL e estas variáveis de ambiente no arquivo `backend/.env`:
+Crie um banco MySQL e configure `backend/.env` com os dados da sua instalação. O código exige:
 
 ```env
-PORT=3001
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
@@ -44,13 +43,9 @@ DB_PASS=
 DB_NAME=dev_resources
 ```
 
-`NOME_ALUNO`, `TURMA`, `FRONTEND_ORIGIN` e `NODE_ENV` são opcionais no código atual. Configure os valores locais de acordo com o MySQL instalado. O arquivo `.env` não é versionado.
-
-A migração encontrada é `backend/migrations/20260928_1627_criar_tabela_produto.sql`, mas sua instrução `CREATE TABLE` está com sintaxe incompleta. Corrija-a antes de executá-la no MySQL.
+`PORT` é opcional e assume `3000`. A migração cria as tabelas quando elas ainda não existem; ela não altera automaticamente uma tabela antiga.
 
 ## Instalação
-
-Instale as dependências em cada diretório:
 
 ```bash
 cd backend
@@ -66,18 +61,22 @@ npm install
 
 ## Execução
 
-Para iniciar o front-end:
+Front-end:
 
 ```bash
 cd frontend
 npm run dev -- --port 3005
 ```
 
-Para iniciar o back-end:
+Back-end:
 
 ```bash
 cd backend
 npm run dev
 ```
 
-A execução do back-end depende de corrigir os imports ausentes no `server.js` ou restaurar os módulos correspondentes. Até isso ser resolvido, a API não estará disponível para o front-end.
+O back-end depende de um `.env` local válido e de alinhar o serviço aos campos atuais antes que as operações do CRUD funcionem corretamente.
+
+
+
+

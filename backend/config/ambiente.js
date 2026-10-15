@@ -1,5 +1,4 @@
-const nomesObrigatorios = ['PORT', 'DB_HOST', 'DB_USER', 'DB_PORT', 'DB_NAME'];
-// DB_PASS ficara de fora, pois ele não aceitara senha vazia (""), que é o padrão XAMPP
+﻿const nomesObrigatorios = ['DB_HOST', 'DB_USER', 'DB_PORT', 'DB_NAME'];
 
 export function carregarAmbiente(arquivoDeConfiguracao) {
   if (arquivoDeConfiguracao) {
@@ -19,10 +18,15 @@ export function carregarAmbiente(arquivoDeConfiguracao) {
     throw new Error(`Configure no .env: ${ausentes.join(', ')}`);
   }
 
+  const porta = Number(process.env.PORT || 3000);
+  if (!Number.isInteger(porta) || porta <= 0 || porta > 65535) {
+    throw new Error('PORT deve ser um número entre 1 e 65535.');
+  }
+
   return {
     nomeAluno: process.env.NOME_ALUNO,
     turma: process.env.TURMA,
-    porta: process.env.PORT,
+    port: porta,
     ambiente: process.env.NODE_ENV || 'development'
   };
 }
@@ -31,11 +35,11 @@ export function exibirDiagnostico(configuracao) {
   console.table({
     estudante: configuracao.nomeAluno,
     turma: configuracao.turma,
-    projeto: 'api-produtos',
+    projeto: 'api-ferramentas',
     ambiente: configuracao.ambiente,
     node: process.version,
     sistema: `${process.platform} ${process.arch}`,
     diretorio: process.cwd(),
-    portaConfigurada: configuracao.porta
+    portaConfigurada: configuracao.port
   });
 }
