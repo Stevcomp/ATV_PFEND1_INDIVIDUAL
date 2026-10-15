@@ -1,95 +1,83 @@
-# DevResources Manager
+﻿# DevResources Manager
 
-Catálogo colaborativo de ferramentas, conversores e utilitários para desenvolvedores. O projeto é dividido em um front-end Next.js e uma API REST em Express com banco de dados MySQL.
-
-## Funcionalidades
-
-- Catálogo público de ferramentas com busca por texto e filtro por categoria.
-- Acesso ao site externo de cada ferramenta.
-- Cadastro e login de usuários.
-- Cadastro, edição e exclusão de ferramentas.
-- Exibição das ações de edição e exclusão somente para quem cadastrou a ferramenta.
-- Interface responsiva feita com CSS.
+Projeto dividido em um front-end Next.js para um catálogo de ferramentas e um back-end Express/MySQL. No estado atual, as duas partes ainda não estão integradas: o front-end apresenta páginas de ferramentas e usuários, enquanto o back-end contém arquivos-base de CRUD de produtos. O servidor ainda referencia módulos de ferramentas e usuários que não estão presentes, e as rotas de produtos não estão registradas nele.
 
 ## Tecnologias
 
-- Next.js com App Router e React.
-- CSS próprio, sem framework de interface.
-- Node.js, Express e MySQL.
-- `bcryptjs` para armazenar senhas com hash.
+- Front-end: Next.js, React e CSS.
+- Back-end: Node.js, Express e MySQL (`mysql2`).
+- `bcryptjs` está listado nas dependências do back-end para uso com senhas.
 
-## Estrutura
+## Estrutura atual
 
 ```text
 backend/
-  config/         configuração do ambiente e conexão MySQL
-  controllers/    tratamento das requisições
-  migrations/     SQL para criar as tabelas
-  models/         validação dos dados e consultas SQL
-  routes/         rotas de usuários e ferramentas
-  services/       regras de cadastro, login e ferramentas
-  server.js       inicialização da API
+  config/       configuração do ambiente e conexão MySQL
+  controllers/  controller do CRUD de produtos
+  migrations/  script SQL da tabela de produtos
+  models/       entidade e consultas de produtos
+  routes/       rotas de produtos
+  services/     regras do CRUD de produtos
+  server.js     inicialização da API (ainda referencia módulos ausentes)
 
 frontend/src/
-  app/            páginas, layout e CSS global
-  components/     Header, CardFerramenta e FormFerramenta
-  services/       chamadas à API e leitura do usuário local
+  app/          páginas, layout e estilos
+  components/   componentes de interface
 ```
 
-## Banco de dados
+## Estado de funcionamento
 
-O banco usado no exemplo é `dev_resources`. Crie-o no MySQL se ainda não existir:
+O back-end ainda não inicia corretamente: `backend/server.js` importa módulos de usuários e ferramentas que não existem atualmente. Além disso, ele não registra `produtoRoutes.js`; portanto, o CRUD de produtos não está acessível por meio do servidor atual.
 
-```sql
-CREATE DATABASE dev_resources
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+As páginas do front-end também esperam chamadas para a API de ferramentas e usuários, mas a pasta `frontend/src/services` não está presente. Assim, a integração entre as páginas e a API precisa ser concluída antes de executar o sistema completo.
+
+## Configuração do banco
+
+O back-end exige um banco MySQL e estas variáveis de ambiente no arquivo `backend/.env`:
+
+```env
+PORT=3001
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASS=
+DB_NAME=dev_resources
 ```
 
-Depois, execute [`backend/migrations/10142026_1945_usuarios_e_ferramentas.sql`](backend/migrations/10142026_1945_usuarios_e_ferramentas.sql) nesse banco. O script cria `usuarios` e `ferramentas`; cada ferramenta referencia seu autor por `usuario_id`.
+`NOME_ALUNO`, `TURMA`, `FRONTEND_ORIGIN` e `NODE_ENV` são opcionais no código atual. Configure os valores locais de acordo com o MySQL instalado. O arquivo `.env` não é versionado.
 
-## Como executar
+A migração encontrada é `backend/migrations/20260928_1627_criar_tabela_produto.sql`, mas sua instrução `CREATE TABLE` está com sintaxe incompleta. Corrija-a antes de executá-la no MySQL.
 
-### API
+## Instalação
 
-1. No diretório `backend`, copie `.env.example` para `.env`.
-2. Configure as credenciais do MySQL e `FRONTEND_ORIGIN` no `.env`.
-3. Instale as dependências e inicie a API:
+Instale as dependências em cada diretório:
 
 ```bash
 cd backend
 npm install
-npm run dev
 ```
-
-A API usa a porta indicada em `PORT` (3001 no exemplo) e disponibiliza as rotas em `http://localhost:3001/api`.
-
-### Front-end
 
 Em outro terminal:
 
 ```bash
 cd frontend
 npm install
+```
+
+## Execução
+
+Para iniciar o front-end:
+
+```bash
+cd frontend
 npm run dev -- --port 3005
 ```
 
-Abra `http://localhost:3005`. O serviço do front-end chama a API em `http://localhost:3001/api`.
+Para iniciar o back-end:
 
-## Rotas da API
+```bash
+cd backend
+npm run dev
+```
 
-| Método | Caminho | Uso |
-| --- | --- | --- |
-| `POST` | `/api/usuarios` | Cadastrar usuário (`nome`, `email`, `senha`) |
-| `POST` | `/api/usuarios/login` | Entrar (`email`, `senha`) |
-| `GET` | `/api/ferramentas` | Listar; aceita `q` e `categoria` |
-| `GET` | `/api/ferramentas/:id` | Consultar uma ferramenta |
-| `POST` | `/api/ferramentas` | Cadastrar ferramenta |
-| `PUT` | `/api/ferramentas/:id` | Editar ferramenta |
-| `DELETE` | `/api/ferramentas/:id` | Excluir ferramenta |
-
-Uma ferramenta contém `nome`, `categoria`, `tipo`, `licenca`, `descricao`, `tags`, `link` e `usuario_id`. O nome do autor retornado pela API vem do registro do usuário.
-
-## Autenticação
-
-Por enquanto, o front-end guarda `{ id, nome, email }` no `localStorage`. A regra de autoria e a proteção das páginas são simuladas no front-end; a API ainda não usa token de sessão.
+A execução do back-end depende de corrigir os imports ausentes no `server.js` ou restaurar os módulos correspondentes. Até isso ser resolvido, a API não estará disponível para o front-end.

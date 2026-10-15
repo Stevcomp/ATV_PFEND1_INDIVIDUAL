@@ -1,11 +1,12 @@
 const nomesObrigatorios = ['PORT', 'DB_HOST', 'DB_USER', 'DB_PORT', 'DB_NAME'];
+// DB_PASS ficara de fora, pois ele não aceitara senha vazia (""), que é o padrão XAMPP
 
 export function carregarAmbiente(arquivoDeConfiguracao) {
   if (arquivoDeConfiguracao) {
     try {
       process.loadEnvFile(arquivoDeConfiguracao);
     } catch {
-      throw new Error(`Arquivo de configuraÃ§Ã£o nÃ£o encontrado: ${arquivoDeConfiguracao}`);
+      throw new Error(`Arquivo de configuração não encontrado: ${arquivoDeConfiguracao}`);
     }
   }
 
@@ -22,7 +23,7 @@ export function carregarAmbiente(arquivoDeConfiguracao) {
     nomeAluno: process.env.NOME_ALUNO,
     turma: process.env.TURMA,
     porta: process.env.PORT,
-    ambiente: process.env.NODE_ENV || 'development',
+    ambiente: process.env.NODE_ENV || 'development'
   };
 }
 
@@ -30,11 +31,11 @@ export function exibirDiagnostico(configuracao) {
   console.table({
     estudante: configuracao.nomeAluno,
     turma: configuracao.turma,
-    projeto: 'devresources-manager',
+    projeto: 'api-produtos',
     ambiente: configuracao.ambiente,
     node: process.version,
     sistema: `${process.platform} ${process.arch}`,
     diretorio: process.cwd(),
-    portaConfigurada: configuracao.porta,
+    portaConfigurada: configuracao.porta
   });
 }
