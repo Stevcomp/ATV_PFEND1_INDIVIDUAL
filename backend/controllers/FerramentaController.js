@@ -29,5 +29,23 @@
             res.status(400).json({ sucesso: false, erro: erro.message });
         }
     }
-    return { listar, buscar, criar }
+
+    async function editar (req, res, next) {
+        try {
+            const ferramentaEditada = await ferramentaService.editar(req.params.id, req.body);
+            res.status(201).json({ sucesso: true, dados: ferramentaEditada });
+        } catch (erro) {
+            res.status(400).json({ sucesso: false, erro: erro.message });
+        }
+    }
+
+    async function deletar(req, res, next) {
+        try {
+            const ferramentaDeletada = await ferramentaService.deletar(req.params.id);
+            res.status(200).json({ sucesso: true, dados: ferramentaDeletada });
+        } catch (erro) {
+            res.status(400).json({ sucesso: false, erro: erro.message });
+        }
+    }
+    return { listar, buscar, criar, editar, deletar }
 }

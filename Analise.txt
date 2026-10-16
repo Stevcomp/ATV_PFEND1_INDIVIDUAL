@@ -1,5 +1,4 @@
-﻿1. backend/controllers/FerramentaController.js e backend/routes/ferramentaRoutes.js — já cobrem listagem, consulta e cadastro. O front-end também espera edição e exclusão, então esses endpoints precisam ser incluídos.
-2. frontend/src/services/api.js e frontend/src/services/auth.js — não estão presentes, mas as páginas do front-end os importam para chamar a API e gerenciar a sessão local.
+﻿1. frontend/src/services/api.js e frontend/src/services/auth.js — não estão presentes, mas as páginas do front-end os importam para chamar a API e gerenciar a sessão local.
 ALTERAÇÕES EM backend/models/FerramentaModel.js
 
 BASE DO PROFESSOR APLICADA EM backend/app.js
