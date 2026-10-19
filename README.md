@@ -1,82 +1,98 @@
-﻿# DevResources Manager
+# DevResources Manager
 
-Projeto com um front-end Next.js para um catálogo de ferramentas e uma API em Express/MySQL. O código está em processo de alinhamento: as páginas do front-end tratam ferramentas e usuários, e o back-end contém a base do CRUD de ferramentas.
+Gerenciador local para organizar ferramentas úteis para desenvolvimento web. A aplicação permite cadastrar, consultar, buscar, editar e excluir ferramentas em um catálogo.
+
+## Proposta
+
+- **Objetivo:** reunir informações e links de ferramentas para desenvolvimento web.
+- **Usuário principal:** pessoa desenvolvedora que deseja consultar ou manter referências de ferramentas.
+- **Registro gerenciado:** ferramenta, com nome, categoria, tipo, descrição e link.
+- **Escopo:** um único tipo principal de registro, sem contas de usuário ou dados relacionados.
 
 ## Tecnologias
 
-- Front-end: Next.js, React e CSS.
-- Back-end: Node.js, Express e MySQL (`mysql2`).
+- **Front-end:** Next.js, React e App Router.
+- **Interface:** Bootstrap 5 e CSS próprio.
+- **Back-end:** Node.js e Express.
+- **Armazenamento:** array em memória no back-end. Os registros são apagados quando a API é reiniciada.
 
-## Estrutura
+## Organização do projeto
 
 ```text
 backend/
-  app.js         configuração do Express, middlewares e rotas
-  config/        configuração do ambiente e conexão MySQL
-  controllers/   tratamento das requisições de ferramentas
-  migrations/    criação da tabela ferramentas
-  models/        entidade e consultas de ferramentas
-  routes/        endpoints de ferramentas
-  services/      regras do CRUD de ferramentas
-  server.js      carregamento do ambiente e inicialização do servidor
+  app.js                     configura o Express e conecta as camadas
+  server.js                  inicia a API local
+  config/ambiente.js         configura e valida a porta
+  models/Ferramenta.js       valida os dados de uma ferramenta
+  models/FerramentaModel.js  mantém os registros em memória
+  services/                  aplica as regras das operações
+  controllers/               prepara as respostas HTTP
+  routes/                    define as rotas da API
 
 frontend/src/
-  app/           páginas, layout e estilos
-  components/    Header, CardFerramenta e FormFerramenta
+  app/                       páginas, layout e CSS global
+  components/                cabeçalho, formulário e cartão de ferramenta
+
+Analise.txt                 explicação dos arquivos e das relações entre eles
 ```
 
-## Estado atual e integração
+As páginas do front-end chamam a API Express com `fetch`. O back-end separa as rotas, os controllers, as regras do service e o armazenamento do model.
 
-O `server.js` segue o padrão de inicialização indicado pelo professor e inicia a aplicação definida em `backend/app.js`. Atualmente, `app.js` registra as rotas `/api/ferramentas`, mas cadastro e login de usuários ainda não estão implementados. As rotas atuais de ferramentas permitem listar, consultar por ID e cadastrar; o front-end também espera edição e exclusão.
+## Campos da ferramenta
 
-As páginas do front-end esperam funções de comunicação com a API em `frontend/src/services`, pasta que não está presente. A migração define as tabelas `usuarios` e `ferramentas`, com `usuario_id` ligado ao autor. O formulário e o card usam os campos `nome`, `categoria`, `tipo`, `descricao` e `link`. O serviço ainda precisa ser alinhado ao model para que o CRUD funcione.
+| Campo | Obrigatório | Limite |
+|---|---:|---:|
+| Nome | Sim | 120 caracteres |
+| Categoria | Sim | 80 caracteres |
+| Tipo | Não | 80 caracteres |
+| Descrição | Sim | 1000 caracteres |
+| Link | Sim | URL começando com `http://` ou `https://` |
 
-## Configuração do banco
+## API
 
-Crie um banco MySQL e configure `backend/.env` com os dados da sua instalação. O código exige:
+Endereço local padrão: `http://localhost:3001/api`.
 
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASS=
-DB_NAME=dev_resources
-```
+| Método | Rota | Operação |
+|---|---|---|
+| GET | `/ferramentas` | Lista as ferramentas |
+| GET | `/ferramentas/:id` | Consulta uma ferramenta pelo ID |
+| POST | `/ferramentas` | Cadastra uma ferramenta |
+| PUT | `/ferramentas/:id` | Atualiza uma ferramenta |
+| DELETE | `/ferramentas/:id` | Exclui uma ferramenta |
+| GET | `/check` | Verifica se a API está ativa |
 
-`PORT` é opcional e assume `3000`. A migração cria as tabelas quando elas ainda não existem; ela não altera automaticamente uma tabela antiga.
+Os dados enviados e recebidos usam JSON. A API valida os campos e retorna mensagens de erro quando a solicitação não pode ser concluída.
 
-## Instalação
+## Como executar localmente
+
+É necessário ter Node.js e npm instalados.
+
+### 1. Iniciar o back-end
+
+No terminal:
 
 ```bash
 cd backend
-npm install
-```
-
-Em outro terminal:
-
-```bash
-cd frontend
-npm install
-```
-
-## Execução
-
-Front-end:
-
-```bash
-cd frontend
-npm run dev -- --port 3005
-```
-
-Back-end:
-
-```bash
-cd backend
+npm ci
 npm run dev
 ```
 
-O back-end depende de um `.env` local válido e de alinhar o serviço aos campos atuais antes que as operações do CRUD funcionem corretamente.
+A API ficará disponível em `http://localhost:3001`. Para verificar se está ativa, acesse `http://localhost:3001/api/check`.
 
+### 2. Iniciar o front-end
 
+Abra outro terminal na pasta do projeto:
 
+```bash
+cd frontend
+npm ci
+npm run dev
+```
 
+Abra `http://localhost:3000` no navegador.
+
+O front-end usa `http://localhost:3001/api` como endereço padrão da API. Para usar outro endereço, configure `NEXT_PUBLIC_API_URL` no ambiente do front-end.
+
+## Observação sobre os dados
+
+As ferramentas são armazenadas somente enquanto o processo do back-end estiver em execução. Ao reiniciar a API, o catálogo volta a ficar vazio. Isso atende ao escopo local da atividade e dispensa banco de dados.

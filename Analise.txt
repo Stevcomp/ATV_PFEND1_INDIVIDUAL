@@ -1,23 +1,61 @@
-﻿1. backend/controllers/FerramentaController.js e backend/routes/ferramentaRoutes.js — já cobrem listagem, consulta e cadastro. O front-end também espera edição e exclusão, então esses endpoints precisam ser incluídos.
-2. frontend/src/services/api.js e frontend/src/services/auth.js — não estão presentes, mas as páginas do front-end os importam para chamar a API e gerenciar a sessão local.
-ALTERAÇÕES EM backend/models/FerramentaModel.js
+ANÁLISE DO PROJETO — DEVRESOURCES MANAGER
 
-BASE DO PROFESSOR APLICADA EM backend/app.js
+PROPOSTA
 
-- A estrutura enviada foi adaptada uma vez (o exemplo da mensagem estava duplicado).
-- `app` agora é criado e exportado como `export const app = express()` para ser importado pelo `server.js`.
-- O middleware `express.json()` permanece para permitir que o Express leia corpos JSON.
-- A criação do pool e a ligação model -> service -> controller -> routes foram mantidas, usando nomes `Ferramenta` em vez de `Produto`.
-- A rota de verificação `/api/check` foi adicionada.
-- A rota principal foi ajustada para `/api/ferramentas`; CORS não foi incluído, conforme combinado.
-- O handler 404 agora informa método e caminho requisitados; o handler de erros mantém o formato geral do exemplo do professor.
-- O serviço ainda precisa ser alinhado aos campos atuais da entidade antes das operações do CRUD funcionarem corretamente.
+- Objetivo: organizar um catálogo local de ferramentas úteis para desenvolvimento web.
+- Usuário principal: pessoa desenvolvedora que consulta e mantém referências de ferramentas.
+- Registro gerenciado: ferramenta, com nome, categoria, tipo, descrição e link.
+- Escopo: um tipo principal de registro. A API guarda os dados em memória, que são apagados quando ela reinicia.
 
-TABELAS DO BANCO E REMOÇÃO DE LICENÇA/TAGS DO FRONT-END
+COMO AS PARTES SE RELACIONAM
 
-- A migração `backend/migrations/20260928_1627_criar_tabela_ferramentas.sql` agora cria duas tabelas simples: `usuarios` (id, nome, email, senha) e `ferramentas` (id, nome, categoria, tipo, descricao, link, usuario_id). `usuario_id` referencia `usuarios.id`.
-- O formulário de ferramentas não exibe nem envia mais `licenca` ou `tags`.
-- O card não exibe mais licença ou tags, e a busca da página inicial não inclui tags nem menciona tags no placeholder.
-- Removi os estilos de licença/tags que ficaram sem uso.
-- A migração usa `CREATE TABLE IF NOT EXISTS`: ela cria as tabelas quando não existem, mas não altera tabelas antigas já criadas. Não executei o SQL no banco.
+O navegador mostra as páginas do Next.js. As páginas usam fetch para enviar e receber dados da API Express. No back-end, as rotas encaminham cada pedido ao controller; o controller chama o service, que valida e aplica as regras usando o model. O model guarda os registros no array em memória.
 
+ARQUIVOS DO PROJETO
+
+RAIZ
+
+- .gitignore — informa ao Git quais arquivos gerados ou locais não devem ser incluídos no controle de versão, como node_modules, .next e arquivos .env. Ajuda a manter o repositório leve e evita publicar configurações locais. Relaciona-se com as pastas de dependências e arquivos de configuração do projeto.
+- README.md — apresenta a proposta, as tecnologias, as rotas e os comandos para instalar e iniciar o front-end e o back-end. É necessário para orientar quem vai usar ou avaliar o projeto. Relaciona-se com backend/package.json, frontend/package.json e com a estrutura descrita neste arquivo.
+- Analise.txt — registra a proposta e explica a função, a necessidade e as relações entre os arquivos do sistema. Serve como documentação complementar para entender e apresentar o projeto. Relaciona-se com todos os arquivos listados aqui.
+
+DOCUMENTAÇÃO DA ATIVIDADE
+
+- docs/projeto_individual_front_end_01.pdf — cópia da documentação da atividade, usada como referência para conferir escopo e requisitos. Não é carregada pelo sistema. Relaciona-se com README.md e com as decisões descritas neste arquivo.
+
+BACK-END
+
+- backend/package.json — declara que o back-end usa módulos ES, lista o Express e define os comandos npm start e npm run dev. É necessário para instalar a biblioteca e iniciar a API. Relaciona-se com backend/package-lock.json, backend/server.js e backend/app.js.
+- backend/package-lock.json — registra as versões exatas das dependências instaladas. Permite reinstalá-las com npm ci de forma consistente. Relaciona-se com backend/package.json.
+- backend/server.js — inicia a API, carrega a configuração da porta e faz o Express começar a receber pedidos. É o ponto de entrada dos comandos definidos em backend/package.json. Relaciona-se com backend/config/ambiente.js e backend/app.js.
+- backend/config/ambiente.js — lê e valida a porta definida pela variável PORT, usando 3001 como padrão. Evita iniciar a API com uma porta inválida. Relaciona-se com backend/server.js.
+- backend/app.js — configura o Express, o JSON, o CORS, a rota de verificação e as rotas de ferramentas; também centraliza erros. É onde as camadas do back-end são conectadas. Relaciona-se com backend/server.js, backend/models/FerramentaModel.js, backend/services/FerramentaService.js, backend/controllers/FerramentaController.js e backend/routes/ferramentaRoutes.js.
+- backend/models/Ferramenta.js — representa e valida os dados de uma ferramenta, incluindo campos obrigatórios, limites de tamanho e URL HTTP/HTTPS. Impede que dados inválidos sejam armazenados. É usado por backend/services/FerramentaService.js e valida os registros mantidos por backend/models/FerramentaModel.js.
+- backend/models/FerramentaModel.js — guarda as ferramentas em um array, atribui IDs e implementa as operações de consulta, criação, atualização e exclusão. É o armazenamento em memória exigido pela atividade. Relaciona-se com backend/services/FerramentaService.js e com backend/models/Ferramenta.js.
+- backend/services/FerramentaService.js — aplica as regras das operações, verifica IDs e usa o model para acessar os registros. Mantém as regras separadas das respostas HTTP. Relaciona-se com backend/models/Ferramenta.js, backend/models/FerramentaModel.js e backend/controllers/FerramentaController.js.
+- backend/controllers/FerramentaController.js — recebe as chamadas das rotas, executa o service e devolve respostas HTTP com dados ou erros. Faz a ligação entre a API e as regras do sistema. Relaciona-se com backend/routes/ferramentaRoutes.js e backend/services/FerramentaService.js.
+- backend/routes/ferramentaRoutes.js — associa os métodos e caminhos HTTP às funções do controller para listar, consultar, cadastrar, atualizar e excluir ferramentas. Relaciona-se com backend/app.js e backend/controllers/FerramentaController.js.
+
+FRONT-END
+
+- frontend/package.json — declara Next.js, React e Bootstrap e define os comandos npm run dev, npm run build e npm start. É necessário para instalar e executar a interface. Relaciona-se com frontend/package-lock.json e com os arquivos da pasta frontend/src.
+- frontend/package-lock.json — registra as versões exatas das dependências do front-end e permite reinstalá-las com npm ci. Relaciona-se com frontend/package.json.
+- frontend/jsconfig.json — configura o atalho @/ para importar arquivos a partir de frontend/src. Facilita as importações usadas nas páginas e componentes. Relaciona-se com os imports em frontend/src/app e frontend/src/components.
+- frontend/.env — arquivo de configuração local do front-end, ignorado pelo Git. O código aceita NEXT_PUBLIC_API_URL para substituir o endereço padrão da API. No momento, as variáveis DB_* que constam neste arquivo não são usadas pelo sistema, pois o projeto não utiliza banco de dados; elas podem ser removidas da configuração local. Relaciona-se com frontend/src/app/page.jsx e com as páginas de cadastro e edição.
+- frontend/src/app/layout.jsx — define a estrutura comum das páginas, importa Bootstrap e o CSS global, mostra o cabeçalho e o rodapé, e configura título e idioma. É o layout raiz do App Router. Relaciona-se com frontend/src/app/globals.css e frontend/src/components/Header/index.jsx.
+- frontend/src/app/globals.css — guarda as cores, os estilos personalizados e as regras responsivas da interface. Mantém o CSS fora dos arquivos JSX. Relaciona-se com frontend/src/app/layout.jsx e com as classes usadas nas páginas e componentes.
+- frontend/src/app/page.jsx — implementa a página inicial: busca e lista as ferramentas, mostra mensagens e solicita exclusão à API. É a tela principal do gerenciador. Relaciona-se com a rota /api/ferramentas, frontend/src/components/CardFerramenta/index.jsx e frontend/src/app/globals.css.
+- frontend/src/app/ferramentas/nova/page.jsx — mostra a tela de cadastro e envia uma nova ferramenta à API. É necessária para a operação de criação. Relaciona-se com frontend/src/components/FormFerramenta/index.jsx, a rota /api/ferramentas e frontend/src/app/globals.css.
+- frontend/src/app/ferramentas/editar/[id]/page.jsx — busca uma ferramenta pelo ID, mostra seus dados e envia alterações à API. É necessária para a operação de edição. Relaciona-se com frontend/src/components/FormFerramenta/index.jsx, a rota /api/ferramentas/:id e frontend/src/app/globals.css.
+- frontend/src/components/Header/index.jsx — mostra o nome do sistema e o link para cadastrar uma ferramenta. É reutilizado pelo layout raiz. Relaciona-se com frontend/src/app/layout.jsx e frontend/src/app/globals.css.
+- frontend/src/components/FormFerramenta/index.jsx — reúne os campos, validações do navegador, mensagens de erro e botões usados tanto no cadastro quanto na edição. Evita duplicar o mesmo formulário nas duas páginas. Relaciona-se com as páginas nova e editar, com backend/models/Ferramenta.js e com frontend/src/app/globals.css.
+- frontend/src/components/CardFerramenta/index.jsx — apresenta os dados de uma ferramenta e os botões para acessar, editar ou excluir. É reutilizado na lista da página inicial. Relaciona-se com frontend/src/app/page.jsx, com as rotas da API e com frontend/src/app/globals.css.
+- frontend/src/app/favicon.ico — ícone exibido pelo navegador para a aplicação. É um recurso visual opcional e não participa das operações do gerenciador. Relaciona-se com o App Router do Next.js.
+
+OBSERVAÇÕES
+
+- Os arquivos api-produtos.zip e Front.zip foram removidos; não são necessários para executar o sistema.
+- As pastas node_modules e .next são geradas pelas ferramentas. Não são arquivos-fonte e podem ser recriadas com npm ci e npm run dev.
+- A API oferece GET, GET por ID, POST, PUT e DELETE em /api/ferramentas e GET /api/check para verificar se está ativa.
+- O front-end usa http://localhost:3001/api como endereço padrão da API. O Next.js é iniciado em http://localhost:3000.
+- O nome configurado em frontend/package.json está escrito como "forntend". Isso não altera os comandos de execução, mas pode ser corrigido para "frontend" por organização.

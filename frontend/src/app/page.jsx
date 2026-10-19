@@ -1,77 +1,110 @@
-﻿"use client";
+"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import CardFerramenta from "@/components/CardFerramenta";
-import { excluirFerramenta, listarFerramentas, extrairLista } from "@/services/api";
-import { lerUsuario } from "@/services/auth";
+
+// A URL pode ser configurada no ambiente; localmente, a API usa a porta 3001.
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api").replace(/\/+$/, "");
+const API = `${API_BASE}/ferramentas`;
+
+async function lerResposta(resposta) {
+  // Evita tentar interpretar como JSON uma página HTML de erro ou configuração.
+  if (!resposta.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("A resposta não veio em JSON. Verifique se a API está ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
+  }
+  return resposta.json();
+}
 
 export default function HomePage() {
   const [ferramentas, setFerramentas] = useState([]);
-  const [usuario, setUsuario] = useState(null);
   const [busca, setBusca] = useState("");
-  const [categoria, setCategoria] = useState("Todas");
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
-    const atualizarUsuario = () => setUsuario(lerUsuario());
-    atualizarUsuario();
-    window.addEventListener("storage", atualizarUsuario);
-    window.addEventListener("devresources-auth-change", atualizarUsuario);
-    return () => {
-      window.removeEventListener("storage", atualizarUsuario);
-      window.removeEventListener("devresources-auth-change", atualizarUsuario);
-    };
+    // Mostra mensagens de retorno após cadastro/edição e carrega o catálogo.
+    const chave = new URLSearchParams(window.location.search).get("mensagem");
+    if (chave === "cadastrada") setMensagem("Ferramenta cadastrada com sucesso.");
+    if (chave === "atualizada") setMensagem("Ferramenta atualizada com sucesso.");
+    if (chave) window.history.replaceState(null, "", "/");
+
+    async function carregarFerramentas() {
+      try {
+        const resposta = await fetch(API);
+        const resultado = await lerResposta(resposta);
+        if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível carregar as ferramentas.");
+        setFerramentas(resultado.dados || []);
+      } catch (error) {
+        setErro(error instanceof TypeError
+          ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
+          : error.message || "Não foi possível conectar à API.");
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    carregarFerramentas();
   }, []);
 
-  useEffect(() => {
-    listarFerramentas()
-      .then((resposta) => setFerramentas(extrairLista(resposta)))
-      .catch((error) => setErro(error.message || "NÃ£o foi possÃ­vel carregar as ferramentas."))
-      .finally(() => setCarregando(false));
-  }, []);
-
-  const categorias = useMemo(() => ["Todas", ...new Set(ferramentas.map((f) => f.categoria).filter(Boolean).sort((a, b) => a.localeCompare(b)))], [ferramentas]);
-  const filtradas = useMemo(() => {
-    const termo = busca.trim().toLocaleLowerCase("pt-BR");
-    return ferramentas.filter((f) => {
-      const correspondeCategoria = categoria === "Todas" || f.categoria === categoria;
-      const texto = [f.nome, f.categoria, f.tipo, f.descricao, f.autor_nome].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR");
-      return correspondeCategoria && (!termo || texto.includes(termo));
-    });
-  }, [busca, categoria, ferramentas]);
-
-  async function excluir(id) {
-    if (!window.confirm("Tem certeza de que deseja excluir esta ferramenta?")) return;
+  async function excluirFerramenta(id) {
+    if (!window.confirm("Deseja excluir esta ferramenta?")) return;
     setErro("");
+    setMensagem("");
     try {
-      await excluirFerramenta(id);
-      setFerramentas((atual) => atual.filter((f) => (f.id ?? f._id) !== id));
-    } catch (error) { setErro(error.message || "NÃ£o foi possÃ­vel excluir a ferramenta."); }
+      const resposta = await fetch(`${API}/${id}`, { method: "DELETE" });
+      const resultado = await lerResposta(resposta);
+      if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível excluir a ferramenta.");
+      setFerramentas((atuais) => atuais.filter((item) => item.id !== id));
+      setMensagem("Ferramenta excluída com sucesso.");
+    } catch (error) {
+      setErro(error instanceof TypeError
+        ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
+        : error.message || "Não foi possível conectar à API.");
+    }
   }
 
+  // A busca é feita no navegador pelos campos principais do registro.
+  const filtradas = ferramentas.filter((item) =>
+    [item.nome, item.categoria, item.tipo, item.descricao]
+      .join(" ")
+      .toLocaleLowerCase("pt-BR")
+      .includes(busca.trim().toLocaleLowerCase("pt-BR"))
+  );
+
   return (
-    <>
-      <section className="home-heading">
-        <div><p className="eyebrow">SUA CAIXA DE FERRAMENTAS PARA DEV</p><h1>Descubra ferramentas que <span>aceleram seu cÃ³digo.</span></h1><p className="home-intro">Uma coleÃ§Ã£o colaborativa de recursos Ãºteis para quem constrÃ³i na web.</p></div>
-        <Link className="button button-primary add-tool" href={usuario ? "/ferramentas/nova" : "/login"}>ï¼‹ Cadastrar ferramenta</Link>
-      </section>
+    <div className="container py-4 py-lg-5">
+      <div className="destaque mb-4 mb-lg-5">
+        <div className="destaque-texto">
+          <p className="destaque-titulo">Recursos para quem constrói na web</p>
+          <h1>Ferramentas para tirar ideias do papel.</h1>
+          <p className="destaque-descricao">Descubra, organize e mantenha à mão os recursos que fazem parte do seu trabalho.</p>
+        </div>
+        <Link className="btn btn-light btn-lg" href="/ferramentas/nova">＋ Cadastrar ferramenta</Link>
+      </div>
 
-      <section className="catalog-controls" aria-label="Busca e filtros">
-        <label className="search-box"><span aria-hidden="true">âŒ•</span><input type="search" value={busca} onChange={(event) => setBusca(event.target.value)} placeholder="Buscar ferramentas, categoriasâ€¦" aria-label="Buscar ferramentas" /></label>
-        <div className="category-filters" aria-label="Filtrar por categoria">{categorias.map((item) => <button type="button" key={item} className={`category-filter ${categoria === item ? "selected" : ""}`} onClick={() => setCategoria(item)}>{item}</button>)}</div>
-      </section>
+      {mensagem && <div className="alert alert-success" role="status">{mensagem}</div>}
+      {erro && <div className="alert alert-danger" role="alert">{erro}</div>}
 
-      <div className="results-heading"><h2>{busca || categoria !== "Todas" ? "Resultados" : "Explore ferramentas"}</h2><span>{carregando ? "Carregandoâ€¦" : `${filtradas.length} ${filtradas.length === 1 ? "ferramenta" : "ferramentas"}`}</span></div>
-      {erro && <p className="notice notice-error home-error" role="alert">{erro}</p>}
-      {carregando ? <div className="empty-state">Carregando catÃ¡logoâ€¦</div> : filtradas.length ? <section className="tools-grid" aria-label="CatÃ¡logo de ferramentas">{filtradas.map((ferramenta) => <CardFerramenta key={ferramenta.id ?? ferramenta._id} ferramenta={ferramenta} onExcluir={excluir} />)}</section> : <section className="empty-state"><span className="empty-icon" aria-hidden="true">âŒ•</span><h2>{busca || categoria !== "Todas" ? "Nenhum resultado encontrado" : "O catÃ¡logo estÃ¡ comeÃ§ando"}</h2><p>{busca || categoria !== "Todas" ? "Tente outro termo ou categoria." : "Seja a primeira pessoa a compartilhar uma ferramenta com a comunidade."}</p>{!busca && categoria === "Todas" && <Link className="text-link" href={usuario ? "/ferramentas/nova" : "/login"}>Cadastrar a primeira ferramenta â†’</Link>}</section>}
+      <div className="busca mb-4 mb-lg-5">
+        <label className="form-label" htmlFor="busca">Buscar ferramentas</label>
+        <input id="busca" className="form-control" type="search" value={busca} onChange={(event) => setBusca(event.target.value)} placeholder="Nome, categoria ou descrição" />
+      </div>
 
-      <style jsx>{`
-        .home-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin:8px 0 34px}.home-heading h1{max-width:700px;margin-top:12px;font-size:clamp(2rem,5vw,3.25rem);line-height:1.08;letter-spacing:-.055em}.home-heading h1 span{color:var(--primary-color)}.home-intro{margin-top:14px;color:var(--text-muted);font-size:1.02rem;line-height:1.6}.add-tool{flex:0 0 auto}.catalog-controls{display:grid;gap:18px;margin-bottom:30px}.search-box{display:flex;align-items:center;gap:11px;padding:0 15px;border:1px solid var(--border-color);border-radius:11px;background:white;color:var(--text-muted)}.search-box:focus-within{border-color:var(--primary-color);box-shadow:0 0 0 3px #2563EB1A}.search-box>span{font-size:1.5rem}.search-box input{width:100%;height:48px;border:0;outline:0;background:transparent;color:var(--text-main)}.category-filters{display:flex;flex-wrap:wrap;gap:9px}.category-filter{padding:8px 14px;border:1px solid var(--border-color);border-radius:22px;background:white;color:var(--text-muted);font-size:.86rem;font-weight:650;cursor:pointer}.category-filter:hover{border-color:var(--primary-color);color:var(--primary-color)}.category-filter.selected{border-color:var(--primary-color);background:var(--primary-color);color:white}.results-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}.results-heading h2{font-size:1.12rem}.results-heading span{color:var(--text-muted);font-size:.84rem}.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.empty-state{padding:56px 20px;border:1px dashed var(--border-color);border-radius:14px;background:#fff;text-align:center;color:var(--text-muted);line-height:1.6}.empty-state h2{margin:10px 0 5px;color:var(--text-main);font-size:1.18rem}.empty-state p{margin-bottom:13px}.empty-icon{font-size:1.8rem;color:var(--primary-color)}.home-error{margin-bottom:18px}@media(max-width:950px){.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.home-heading{align-items:flex-start;flex-direction:column}.tools-grid{grid-template-columns:1fr}.add-tool{width:100%}.category-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:5px}.category-filter{white-space:nowrap}}
-      `}</style>
-    </>
+      {carregando ? <p role="status">Carregando ferramentas...</p> : filtradas.length > 0 ? (
+        <div className="row g-3">
+          {filtradas.map((item) => (
+            <div className="col-12 col-md-6 col-lg-4" key={item.id}>
+              <CardFerramenta ferramenta={item} onExcluir={excluirFerramenta} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="vazio alert alert-light border">
+          {busca ? "Nenhuma ferramenta corresponde à busca." : "O catálogo está vazio. Cadastre a primeira ferramenta."}
+        </div>
+      )}
+    </div>
   );
 }
-
-

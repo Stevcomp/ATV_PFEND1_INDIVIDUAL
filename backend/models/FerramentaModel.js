@@ -1,25 +1,37 @@
-﻿export function criarFerramentaModel({ pool }) {
-    const colunas = "id, nome, categoria, tipo, descricao, link, usuario_id";
+// Guarda os registros em memória; reiniciar a API cria um array vazio.
+export function criarFerramentaModel() {
+  const ferramentas = [];
+  let proximoId = 1;
 
-    async function listarTodos() {
-        const [linhas] = await pool.query(`SELECT ${colunas} FROM ferramentas`);
-        return linhas;
-    }
+  async function listarTodos() {
+    // Retorna cópias para que a resposta da API não altere o array diretamente.
+    return ferramentas.map((ferramenta) => ({ ...ferramenta }));
+  }
 
-    async function buscarPorId(id) {
-        const [linhas] = await pool.query(
-            `SELECT ${colunas} FROM ferramentas WHERE id = ?`,
-            [id]
-        );
-        return linhas[0] ?? null;
-    }
+  async function buscarPorId(id) {
+    const ferramenta = ferramentas.find((item) => item.id === id);
+    return ferramenta ? { ...ferramenta } : null;
+  }
 
-    async function criar(ferramenta) {
-        const sql = `INSERT INTO ferramentas (nome, categoria, tipo, descricao, link, usuario_id) VALUES (?, ?, ?, ?, ?, ?)`;
-        const valores = [ferramenta.nome, ferramenta.categoria, ferramenta.tipo, ferramenta.descricao, ferramenta.link, ferramenta.usuario_id];
-        const [resultado] = await pool.query(sql, valores);
-        return { ...ferramenta, id: resultado.insertId };
-    }
+  async function criar(ferramenta) {
+    const novaFerramenta = { ...ferramenta, id: proximoId++ };
+    ferramentas.push(novaFerramenta);
+    return { ...novaFerramenta };
+  }
 
-    return { listarTodos, buscarPorId, criar };
+  async function atualizar(id, ferramenta) {
+    const indice = ferramentas.findIndex((item) => item.id === id);
+    if (indice === -1) return null;
+    ferramentas[indice] = { ...ferramenta, id };
+    return { ...ferramentas[indice] };
+  }
+
+  async function excluir(id) {
+    const indice = ferramentas.findIndex((item) => item.id === id);
+    if (indice === -1) return null;
+    const [removida] = ferramentas.splice(indice, 1);
+    return { ...removida };
+  }
+
+  return { listarTodos, buscarPorId, criar, atualizar, excluir };
 }

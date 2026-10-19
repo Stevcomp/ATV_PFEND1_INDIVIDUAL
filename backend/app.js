@@ -1,5 +1,4 @@
 ﻿import express from 'express';
-import { criarPool } from './config/database.js';
 import { criarFerramentaModel } from './models/FerramentaModel.js';
 import { criarFerramentaService } from './services/FerramentaService.js';
 import { criarFerramentaController } from './controllers/FerramentaController.js';
@@ -7,11 +6,17 @@ import { criarFerramentaRoutes } from './routes/ferramentaRoutes.js';
 
 export const app = express();
 
-// Middleware: ensina o Express a ler o corpo da requisição em JSON
+// Conecta as camadas da API e define middlewares, rotas e respostas de erro.
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
-const pool = criarPool();
-const ferramentaModel = criarFerramentaModel({ pool });
+const ferramentaModel = criarFerramentaModel();
 const ferramentaService = criarFerramentaService({ ferramentaModel });
 const ferramentaController = criarFerramentaController({ ferramentaService });
 const ferramentaRoutes = criarFerramentaRoutes({ ferramentaController });

@@ -1,30 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import FormFerramenta from "@/components/FormFerramenta";
-import { criarFerramenta } from "@/services/api";
-import { lerUsuario } from "@/services/auth";
+
+// Esta página envia novos registros para a API Express.
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api").replace(/\/+$/, "");
+const API = `${API_BASE}/ferramentas`;
+
+async function lerResposta(resposta) {
+  // Mostra uma mensagem clara se a URL configurada responder com HTML.
+  if (!resposta.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("A resposta não veio em JSON. Verifique se a API está ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
+  }
+  return resposta.json();
+}
 
 export default function NovaFerramentaPage() {
   const router = useRouter();
-  const [usuario, setUsuario] = useState(null);
-  const [verificando, setVerificando] = useState(true);
-
-  useEffect(() => {
-    const atual = lerUsuario();
-    if (!atual) router.replace("/login");
-    else setUsuario(atual);
-    setVerificando(false);
-  }, [router]);
 
   async function salvar(dados) {
-    await criarFerramenta({ ...dados, usuario_id: usuario.id, autor_nome: usuario.nome });
-    router.push("/");
-    router.refresh();
+    const resposta = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados),
+    });
+    const resultado = await lerResposta(resposta);
+    if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível cadastrar a ferramenta.");
+    router.push("/?mensagem=cadastrada");
   }
 
-  if (verificando || !usuario) return <p role="status">Verificando acesso…</p>;
-
-  return <section className="surface-panel tool-form-panel"><div className="page-heading"><p className="eyebrow">CONTRIBUA COM A COMUNIDADE</p><h1>Cadastrar ferramenta</h1><p>Compartilhe um recurso útil com outros desenvolvedores.</p></div><FormFerramenta onSubmit={salvar} textoBotao="Publicar ferramenta" /><style jsx>{`.tool-form-panel{max-width:760px;margin:0 auto}`}</style></section>;
+  return (
+    <div className="container py-4">
+      <div className="card formulario-card">
+        <div className="card-body p-4">
+          <h1 className="h2 mb-2">Cadastrar ferramenta</h1>
+          <p className="text-secondary mb-4">Informe os dados do recurso que deseja incluir no catálogo.</p>
+          <FormFerramenta onSubmit={salvar} textoBotao="Cadastrar" />
+        </div>
+      </div>
+    </div>
+  );
 }

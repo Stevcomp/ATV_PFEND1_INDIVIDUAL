@@ -2,46 +2,63 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import "./FormFerramenta.css";
 
-const INICIAL = { nome: "", categoria: "", tipo: "", descricao: "", link: "" };
+const VAZIO = { nome: "", categoria: "", tipo: "", descricao: "", link: "" };
 
-function paraFormulario(ferramenta = {}) {
-  return {
-    nome: ferramenta.nome || "",
-    categoria: ferramenta.categoria || "",
-    tipo: ferramenta.tipo || "",
-    descricao: ferramenta.descricao || "",
-    link: ferramenta.link || ""
-  };
-}
-
-export default function FormFerramenta({ valores = INICIAL, onSubmit, textoBotao = "Salvar ferramenta" }) {
-  const [form, setForm] = useState(() => paraFormulario(valores));
+// Formulário compartilhado pelo cadastro e pela edição.
+export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }) {
+  const [form, setForm] = useState({ ...VAZIO, ...valores });
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
 
-  function alterar(event) { setForm((atual) => ({ ...atual, [event.target.name]: event.target.value })); }
+  function alterar(event) {
+    setForm({ ...form, [event.target.name]: event.target.value });
+  }
 
   async function enviar(event) {
     event.preventDefault();
     setErro("");
     setSalvando(true);
-    try { await onSubmit({ ...form }); }
-    catch (error) { setErro(error.message || "Não foi possível salvar a ferramenta."); setSalvando(false); }
+    try {
+      await onSubmit(form);
+    } catch (error) {
+      setErro(error instanceof TypeError
+        ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
+        : error.message || "Não foi possível salvar a ferramenta.");
+      setSalvando(false);
+    }
   }
 
   return (
-    <form className="tool-form" onSubmit={enviar}>
-      <div className="form-grid">
-        <label>Nome da ferramenta<input name="nome" value={form.nome} onChange={alterar} maxLength={120} required placeholder="Ex.: Hoppscotch" /></label>
-        <label>Categoria<input name="categoria" value={form.categoria} onChange={alterar} maxLength={80} required placeholder="Ex.: API & Backend" /></label>
-        <label>Tipo<input name="tipo" value={form.tipo} onChange={alterar} maxLength={80} placeholder="Ex.: API Client" /></label>
-        <label className="form-wide">Link da ferramenta<input name="link" type="url" value={form.link} onChange={alterar} required placeholder="https://exemplo.com" /></label>
-        <label className="form-wide">Descrição<textarea name="descricao" value={form.descricao} onChange={alterar} rows={5} maxLength={1000} required placeholder="Descreva o que a ferramenta faz." /></label>
+    <form onSubmit={enviar}>
+      <div className="row g-3">
+        <div className="col-12 col-md-6">
+          <label className="form-label" htmlFor="nome">Nome</label>
+          <input className="form-control" id="nome" name="nome" value={form.nome} onChange={alterar} maxLength={120} required />
+        </div>
+        <div className="col-12 col-md-6">
+          <label className="form-label" htmlFor="categoria">Categoria</label>
+          <input className="form-control" id="categoria" name="categoria" value={form.categoria} onChange={alterar} maxLength={80} required />
+        </div>
+        <div className="col-12 col-md-6">
+          <label className="form-label" htmlFor="tipo">Tipo</label>
+          <input className="form-control" id="tipo" name="tipo" value={form.tipo} onChange={alterar} maxLength={80} />
+        </div>
+        <div className="col-12 col-md-6">
+          <label className="form-label" htmlFor="link">Link</label>
+          <input className="form-control" id="link" name="link" type="url" value={form.link} onChange={alterar} placeholder="https://exemplo.com" required />
+        </div>
+        <div className="col-12">
+          <label className="form-label" htmlFor="descricao">Descrição</label>
+          <textarea className="form-control" id="descricao" name="descricao" rows={4} maxLength={1000} value={form.descricao} onChange={alterar} required />
+        </div>
       </div>
-      {erro && <p className="notice notice-error" role="alert">{erro}</p>}
-      <div className="form-actions"><button className="button button-primary" type="submit" disabled={salvando}>{salvando ? "Salvando…" : textoBotao}</button><Link className="button button-secondary" href="/">Cancelar</Link></div>
+
+      {erro && <div className="alert alert-danger mt-3" role="alert">{erro}</div>}
+      <div className="d-flex gap-2 mt-4">
+        <button className="btn btn-primary" type="submit" disabled={salvando}>{salvando ? "Salvando..." : textoBotao}</button>
+        <Link className="btn btn-secondary" href="/">Cancelar</Link>
+      </div>
     </form>
   );
 }
