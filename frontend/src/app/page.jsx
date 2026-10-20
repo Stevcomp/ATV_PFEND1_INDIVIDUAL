@@ -3,20 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import CardFerramenta from "@/components/CardFerramenta";
-
-// A URL pode ser configurada no ambiente; localmente, a API usa a porta 3001.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api").replace(/\/+$/, "");
-const API = `${API_BASE}/ferramentas`;
-
-async function lerResposta(resposta) {
-  // Evita tentar interpretar como JSON uma página HTML de erro ou configuração.
-  if (!resposta.headers.get("content-type")?.includes("application/json")) {
-    throw new Error("A resposta não veio em JSON. Verifique se a API está ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
-  }
-  return resposta.json();
-}
+import { API_FERRAMENTAS, chamarApi } from "@/components/FormFerramenta";
 
 export default function HomePage() {
+  // Guarda os dados da tela e os estados de carregamento, busca e mensagens.
   const [ferramentas, setFerramentas] = useState([]);
   const [busca, setBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
@@ -32,9 +22,7 @@ export default function HomePage() {
 
     async function carregarFerramentas() {
       try {
-        const resposta = await fetch(API);
-        const resultado = await lerResposta(resposta);
-        if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível carregar as ferramentas.");
+        const resultado = await chamarApi(API_FERRAMENTAS);
         setFerramentas(resultado.dados || []);
       } catch (error) {
         setErro(error instanceof TypeError
@@ -48,14 +36,13 @@ export default function HomePage() {
     carregarFerramentas();
   }, []);
 
+  // Confirma a exclusão, remove o registro na API e atualiza a lista exibida.
   async function excluirFerramenta(id) {
     if (!window.confirm("Deseja excluir esta ferramenta?")) return;
     setErro("");
     setMensagem("");
     try {
-      const resposta = await fetch(`${API}/${id}`, { method: "DELETE" });
-      const resultado = await lerResposta(resposta);
-      if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível excluir a ferramenta.");
+      await chamarApi(`${API_FERRAMENTAS}/${id}`, { method: "DELETE" });
       setFerramentas((atuais) => atuais.filter((item) => item.id !== id));
       setMensagem("Ferramenta excluída com sucesso.");
     } catch (error) {
@@ -73,6 +60,7 @@ export default function HomePage() {
       .includes(busca.trim().toLocaleLowerCase("pt-BR"))
   );
 
+  // Exibe o catálogo, a busca e os estados de carregamento, erro ou lista vazia.
   return (
     <div className="container py-4 py-lg-5">
       <div className="destaque mb-4 mb-lg-5">

@@ -3,41 +3,29 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import FormFerramenta from "@/components/FormFerramenta";
-
-// Usa o ID da URL para carregar e atualizar o registro selecionado.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api").replace(/\/+$/, "");
-const API = `${API_BASE}/ferramentas`;
-
-async function lerResposta(resposta) {
-  // Mostra uma mensagem clara se a URL configurada responder com HTML.
-  if (!resposta.headers.get("content-type")?.includes("application/json")) {
-    throw new Error("A resposta não veio em JSON. Verifique se a API está ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
-  }
-  return resposta.json();
-}
+import { API_FERRAMENTAS, chamarApi } from "@/components/FormFerramenta";
 
 export default function EditarFerramentaPage() {
+  // Obtém da URL o ID da ferramenta que será carregada e editada.
   const { id } = useParams();
   const router = useRouter();
+  // Guarda a ferramenta carregada e o estado da tela durante a busca.
   const [ferramenta, setFerramenta] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
+  // Busca os dados da ferramenta sempre que o ID da rota mudar.
   useEffect(() => {
     async function carregarFerramenta() {
       try {
-        const resposta = await fetch(`${API}/${id}`);
-        const resultado = await lerResposta(resposta);
-        if (resposta.status === 404) {
-          // A API guarda os dados em memória; reiniciá-la apaga os registros.
-          throw new Error("Esta ferramenta não está na API atual. Os registros ficam em memória e são apagados quando o back-end reinicia. Volte ao catálogo e cadastre novamente.");
-        }
-        if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível carregar a ferramenta.");
+        const resultado = await chamarApi(`${API_FERRAMENTAS}/${id}`);
         setFerramenta(resultado.dados);
       } catch (error) {
-        setErro(error instanceof TypeError
-          ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
-          : error.message || "Não foi possível conectar à API.");
+        setErro(error.status === 404
+          ? "Esta ferramenta não está na API atual. Os registros ficam em memória e são apagados quando o back-end reinicia. Volte ao catálogo e cadastre novamente."
+          : error instanceof TypeError
+            ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
+            : error.message || "Não foi possível conectar à API.");
       } finally {
         setCarregando(false);
       }
@@ -46,17 +34,17 @@ export default function EditarFerramentaPage() {
     carregarFerramenta();
   }, [id]);
 
+  // Envia as alterações à API e volta ao catálogo após salvar.
   async function salvar(dados) {
-    const resposta = await fetch(`${API}/${id}`, {
+    await chamarApi(`${API_FERRAMENTAS}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados),
     });
-    const resultado = await lerResposta(resposta);
-    if (!resposta.ok) throw new Error(resultado.erro || "Não foi possível atualizar a ferramenta.");
     router.push("/?mensagem=atualizada");
   }
 
+  // Exibe carregamento, erros ou o formulário preenchido para edição.
   return (
     <div className="container py-4">
       <div className="card formulario-card">

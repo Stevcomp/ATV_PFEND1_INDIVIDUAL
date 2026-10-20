@@ -1,6 +1,7 @@
 // Valida e normaliza os campos antes de uma ferramenta entrar no model.
 export default class Ferramenta {
   constructor({ id, nome, categoria, tipo = "", descricao, link }) {
+    // Valida o ID somente quando ele foi informado (como em caso de atualização); na criação, o model ainda não recebe um ID.
     if (id !== undefined && (!Number.isInteger(id) || id <= 0)) {
       throw new TypeError("ID deve ser um inteiro positivo.");
     }
@@ -36,6 +37,7 @@ export default class Ferramenta {
       throw new TypeError("Link deve ser uma URL válida iniciada por http ou https.");
     }
 
+    // Inclui o ID no objeto apenas quando ele foi informado, como em uma atualização.
     if (id !== undefined) this.id = id;
     this.nome = nome.trim();
     this.categoria = categoria.trim();

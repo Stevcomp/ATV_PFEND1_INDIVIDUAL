@@ -9,6 +9,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  // Define a estrutura compartilhada por todas as páginas do front-end.
   return (
     <html lang="pt-BR">
       <body>

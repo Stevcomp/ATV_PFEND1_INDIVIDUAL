@@ -3,6 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api").replace(/\/+$/, "");
+export const API_FERRAMENTAS = `${API_BASE}/ferramentas`;
+
+// Envia uma requisição à API e retorna os dados da resposta.
+export async function chamarApi(url, opcoes = {}) {
+  const resposta = await fetch(url, opcoes);
+  if (!resposta.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("A resposta não veio em JSON. Verifique se a API está ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
+  }
+
+  const resultado = await resposta.json();
+  if (!resposta.ok) {
+    const erro = new Error(resultado.erro || "Não foi possível concluir a requisição.");
+    erro.status = resposta.status;
+    throw erro;
+  }
+
+  return resultado;
+}
+
 const VAZIO = { nome: "", categoria: "", tipo: "", descricao: "", link: "" };
 
 // Formulário compartilhado pelo cadastro e pela edição.

@@ -1,5 +1,6 @@
 ﻿export function criarFerramentaController({ ferramentaService }) {
-    // Cada função responde a uma operação da API e encaminha erros não tratados.
+    // Cada função responde a uma operação da API e encaminha erros não tratados (de acordo com a lógica de api-produtos - Node.js do Rodrigo).
+    // Lista todas as ferramentas e responde com status 200.
     async function listar(req, res, next) {
         try {
             const ferramentas = await ferramentaService.listar();
@@ -9,6 +10,7 @@
         }
     }
 
+    // Busca pelo ID da URL; responde 400 se o ID for inválido e 404 se não encontrar.
     async function buscar(req, res, next) {
         try {
             const ferramenta = await ferramentaService.buscarPorId(req.params.id);
@@ -22,6 +24,7 @@
         }
     }
 
+    // Cria uma ferramenta com os dados do corpo da requisição e responde com status 201.
     async function criar(req, res, next) {
         try {
             const ferramentaNovo = await ferramentaService.criar(req.body);
@@ -32,6 +35,7 @@
         }
     }
 
+    // Atualiza pelo ID da URL usando os dados enviados no corpo da requisição; responde 400 se o ID for inválido e 404 se não encontrar.
     async function atualizar(req, res, next) {
         try {
             const ferramenta = await ferramentaService.atualizar(req.params.id, req.body);
@@ -43,6 +47,7 @@
         }
     }
 
+    // Exclui pelo ID da URL e retorna os dados da ferramenta removida.
     async function excluir(req, res, next) {
         try {
             const ferramenta = await ferramentaService.excluir(req.params.id);
