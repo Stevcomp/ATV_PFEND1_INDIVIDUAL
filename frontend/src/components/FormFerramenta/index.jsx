@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-// Monta o endereço base usado pelo front-end para chamar a API
+// Monta o endereço-base usado pelo front-end para chamar a API.
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api");
 export const API_FERRAMENTAS = `${API_BASE}/ferramentas`;
 
@@ -16,7 +16,7 @@ export async function chamarApi(url, opcoes = {}) {
 
   const resultado = await resposta.json();
   if (!resposta.ok) {
-    const erro = new Error("Não foi possível concluir a requisição.");
+    const erro = new Error(resultado.erro || "Não foi possível concluir a requisição.");
     erro.status = resposta.status;
     throw erro;
   }
@@ -29,7 +29,7 @@ const VAZIO = { nome: "", categoria: "", tipo: "", descricao: "", link: "" };
 // Formulário compartilhado pelo cadastro e pela edição.
 export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }) {
   const [form, setForm] = useState({ ...VAZIO, ...valores });
-  const [erro, setErro] = useState("Falha ao enviar o formulário. Reveja os campos e tente novamente.");
+  const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
 
   // Copia os dados atuais e atualiza somente o campo que disparou o evento, usando seu name como propriedade e o texto digitado como valor.
@@ -38,7 +38,7 @@ export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }
   }
 
   async function enviar(event) {
-    // Impede que a pagina seja recarregada ao enviar o formulário.
+    // Impede que a página seja recarregada ao enviar o formulário.
     event.preventDefault();
     setErro("");
     setSalvando(true);
@@ -46,8 +46,8 @@ export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }
       await onSubmit(form);
     } catch (error) {
       setErro(error instanceof TypeError
-        ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
-        : "Não foi possível salvar a ferramenta.");
+        ? `Não foi possível conectar à API em ${API_BASE}. Inicie o back-end com npm run dev na pasta backend.`
+        : error.message || "Não foi possível salvar a ferramenta.");
       setSalvando(false);
     }
   }
@@ -72,7 +72,7 @@ export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }
           <input className="form-control" id="link" name="link" type="url" value={form.link} onChange={alterar} placeholder="https://exemplo.com" required />
         </div>
         <div className="col-12">
-          <label className="form-label" htmlFor="descricao">Descriçãoo</label>
+          <label className="form-label" htmlFor="descricao">Descrição</label>
           <textarea className="form-control" id="descricao" name="descricao" rows={4} maxLength={1000} value={form.descricao} onChange={alterar} required />
         </div>
       </div>

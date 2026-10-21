@@ -14,7 +14,7 @@ export default function HomePage() {
   const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
-    // Mostra mensagens de retorno após cadastro/edição e carrega o catálogo. (avançado porém simples de fazer e entender e é mais profissional)
+    // Mostra mensagens de retorno após cadastro ou edição e carrega o catálogo.
     const chave = new URLSearchParams(window.location.search).get("mensagem");
     if (chave === "cadastrada") setMensagem("Ferramenta cadastrada com sucesso.");
     if (chave === "atualizada") setMensagem("Ferramenta atualizada com sucesso.");
@@ -27,7 +27,7 @@ export default function HomePage() {
         setFerramentas(resultado.dados || []);
       } catch (error) {
         setErro(error instanceof TypeError
-          // Ternário onde é o erro é validado como TypeError ou não e escolhe a mensagem conforme o tipo de erro.
+          // Verifica se o erro é um TypeError e escolhe a mensagem correspondente.
           ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
           : "Não foi possível conectar à API, reveja as configurações do sistema.");
       } finally {
@@ -57,11 +57,11 @@ export default function HomePage() {
   // A busca é feita no navegador pelos campos principais do registro.
   const filtradas = ferramentas.filter((item) =>
     [item.nome, item.categoria, item.tipo, item.descricao]
-    // Junta os valores em um único texto espaçado e faz com que a busca correspondaa qualquer campo do registro.
+    // Junta os valores em um único texto para permitir a busca em qualquer campo do registro.
       .join(" ")
-      // Converte os dados da ferramenta para letras minúsculas (em pt-br).
+      // Converte os dados da ferramenta para letras minúsculas, considerando as regras do português.
       .toLocaleLowerCase("pt-BR")
-      // Verifica se os dados contém o que foi digitado na busca, remove espaços extras e converte os dados da busca para letras minúsculas.
+      // Verifica se os dados contêm o texto buscado, ignorando espaços no início e no fim e diferenças entre maiúsculas e minúsculas.
       .includes(busca.trim().toLocaleLowerCase("pt-BR"))
   );
 
@@ -85,7 +85,7 @@ export default function HomePage() {
         <input id="busca" className="form-control" type="search" value={busca} onChange={(event) => setBusca(event.target.value)} placeholder="Nome, categoria ou descrição" />
       </div>
 
-      {carregando ? <p role="status">Carregando ferramentas...</p> : filtradas.length > 0 ? (
+      {carregando ? <p role="status">Carregando ferramentas...</p> : erro ? null : filtradas.length > 0 ? (
         <div className="row g-3">
           {filtradas.map((item) => (
             <div className="col-12 col-md-6 col-lg-4" key={item.id}>

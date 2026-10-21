@@ -11,9 +11,12 @@ export default function NovaFerramentaPage() {
   async function salvar(dados) {
     await chamarApi(API_FERRAMENTAS, {
       method: "POST",
+      // Informa que o conteúdo está em JSON para o servidor interpretá-lo corretamente.
       headers: { "Content-Type": "application/json" },
+      // Converte os dados do formulário para JSON.
       body: JSON.stringify(dados),
     });
+    // Redireciona o usuário de volta ao catálogo.
     router.push("/?mensagem=cadastrada");
   }
 

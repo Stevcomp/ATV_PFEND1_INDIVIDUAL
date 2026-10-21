@@ -6,10 +6,12 @@ import FormFerramenta from "@/components/FormFerramenta";
 import { API_FERRAMENTAS, chamarApi } from "@/components/FormFerramenta";
 
 export default function EditarFerramentaPage() {
+
   // Obtém da URL o ID da ferramenta que será carregada e editada.
   const { id } = useParams();
   const router = useRouter();
-  // Guarda a ferramenta carregada e o estado da tela durante a busca.
+  // O ID indica qual registro buscar. Enquanto a API busca os dados, ferramenta
+  // fica null, carregando mantém o aviso visível e erro começa vazio.
   const [ferramenta, setFerramenta] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -22,10 +24,10 @@ export default function EditarFerramentaPage() {
         setFerramenta(resultado.dados);
       } catch (error) {
         setErro(error.status === 404
-          ? "Esta ferramenta não está na API atual. Os registros ficam em memória e são apagados quando o back-end reinicia. Volte ao catálogo e cadastre novamente."
+          ? "Registro não encontardo. Volte ao catálogo e cadastre novamente."
           : error instanceof TypeError
             ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
-            : error.message || "Não foi possível conectar à API.");
+            : "Não foi possível conectar à API.");
       } finally {
         setCarregando(false);
       }
@@ -38,7 +40,9 @@ export default function EditarFerramentaPage() {
   async function salvar(dados) {
     await chamarApi(`${API_FERRAMENTAS}/${id}`, {
       method: "PUT",
+      // Informa que o conteúdo está em JSON para o servidor interpretá-lo corretamente.
       headers: { "Content-Type": "application/json" },
+      // Converte os dados do formulário para JSON.
       body: JSON.stringify(dados),
     });
     router.push("/?mensagem=atualizada");
@@ -54,6 +58,7 @@ export default function EditarFerramentaPage() {
           {carregando && <p role="status">Carregando ferramenta...</p>}
           {erro && <div className="alert alert-danger" role="alert">{erro}</div>}
           {ferramenta && <FormFerramenta key={ferramenta.id} valores={ferramenta} onSubmit={salvar} textoBotao="Salvar alterações" />}
+          {/* Se a busca terminar com erro, mostra um link para voltar ao catálogo. */}
           {!carregando && erro && <a className="btn btn-outline-secondary mt-3" href="/">Voltar ao catálogo</a>}
         </div>
       </div>

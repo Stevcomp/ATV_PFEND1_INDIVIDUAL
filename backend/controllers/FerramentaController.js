@@ -1,5 +1,5 @@
-﻿export function criarFerramentaController({ ferramentaService }) {
-    // Cada função responde a uma operação da API e encaminha erros não tratados (de acordo com a lógica de api-produtos - Node.js do Rodrigo).
+export function criarFerramentaController({ ferramentaService }) {
+    // Cada função responde a uma operação da API e encaminha erros não tratados ao middleware de erro.
     // Lista todas as ferramentas e responde com status 200.
     async function listar(req, res, next) {
         try {
