@@ -2,10 +2,7 @@ import { existsSync } from 'node:fs';
 
 // Usa PORT quando informada (no caso do projeto local, a API fica na porta 3001); Se o arquivoDeConfiguracao (.env) não existir, a API carrega a mensagem de erro.
 export function carregarAmbiente(arquivoDeConfiguracao) {
-  if (arquivoDeConfiguracao) {
-    if (!existsSync(arquivoDeConfiguracao)) {
-      throw new Error(`Arquivo não encontrado: ${arquivoDeConfiguracao}`);
-    }
+  if (arquivoDeConfiguracao && existsSync(arquivoDeConfiguracao)) {
     process.loadEnvFile(arquivoDeConfiguracao);
   }
 

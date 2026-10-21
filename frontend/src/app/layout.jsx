@@ -14,9 +14,9 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR">
       <body>
         <Header />
-        <main className="conteudo">{children}</main>
-        <footer className="rodape border-top py-3 text-center">
-          © {new Date().getFullYear()} DevResources Manager · Catálogo local de ferramentas
+        <main className="main">{children}</main>
+        <footer className="footer border-top py-3 text-center">
+          © 2026 DevResources Manager · Catálogo local de ferramentas
         </footer>
       </body>
     </html>

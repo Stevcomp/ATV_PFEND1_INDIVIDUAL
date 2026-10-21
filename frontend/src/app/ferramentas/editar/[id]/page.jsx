@@ -47,7 +47,7 @@ export default function EditarFerramentaPage() {
   // Exibe carregamento, erros ou o formulário preenchido para edição.
   return (
     <div className="container py-4">
-      <div className="card formulario-card">
+      <div className="card form-card">
         <div className="card-body p-4">
           <h1 className="h2 mb-2">Editar ferramenta</h1>
           <p className="text-secondary mb-4">Atualize os dados deste registro.</p>

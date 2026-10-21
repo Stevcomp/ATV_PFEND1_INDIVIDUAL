@@ -14,10 +14,11 @@ export default function HomePage() {
   const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
-    // Mostra mensagens de retorno após cadastro/edição e carrega o catálogo.
+    // Mostra mensagens de retorno após cadastro/edição e carrega o catálogo. (avançado porém simples de fazer e entender e é mais profissional)
     const chave = new URLSearchParams(window.location.search).get("mensagem");
     if (chave === "cadastrada") setMensagem("Ferramenta cadastrada com sucesso.");
     if (chave === "atualizada") setMensagem("Ferramenta atualizada com sucesso.");
+    // Não altera o caminho do navegador.
     if (chave) window.history.replaceState(null, "", "/");
 
     async function carregarFerramentas() {
@@ -26,8 +27,9 @@ export default function HomePage() {
         setFerramentas(resultado.dados || []);
       } catch (error) {
         setErro(error instanceof TypeError
+          // Ternário onde é o erro é validado como TypeError ou não e escolhe a mensagem conforme o tipo de erro.
           ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
-          : error.message || "Não foi possível conectar à API.");
+          : "Não foi possível conectar à API, reveja as configurações do sistema.");
       } finally {
         setCarregando(false);
       }
@@ -37,10 +39,10 @@ export default function HomePage() {
   }, []);
 
   // Confirma a exclusão, remove o registro na API e atualiza a lista exibida.
+  // Recebe o pedido de exclusão do CardFerramenta pelo id da ferramenta.
   async function excluirFerramenta(id) {
-    if (!window.confirm("Deseja excluir esta ferramenta?")) return;
-    setErro("");
-    setMensagem("");
+    if (!window.confirm("Deseja excluir esta ferramenta?")) 
+      return;
     try {
       await chamarApi(`${API_FERRAMENTAS}/${id}`, { method: "DELETE" });
       setFerramentas((atuais) => atuais.filter((item) => item.id !== id));
@@ -48,26 +50,29 @@ export default function HomePage() {
     } catch (error) {
       setErro(error instanceof TypeError
         ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
-        : error.message || "Não foi possível conectar à API.");
+        : "Não foi possível conectar à API.");
     }
   }
 
   // A busca é feita no navegador pelos campos principais do registro.
   const filtradas = ferramentas.filter((item) =>
     [item.nome, item.categoria, item.tipo, item.descricao]
+    // Junta os valores em um único texto espaçado e faz com que a busca correspondaa qualquer campo do registro.
       .join(" ")
+      // Converte os dados da ferramenta para letras minúsculas (em pt-br).
       .toLocaleLowerCase("pt-BR")
+      // Verifica se os dados contém o que foi digitado na busca, remove espaços extras e converte os dados da busca para letras minúsculas.
       .includes(busca.trim().toLocaleLowerCase("pt-BR"))
   );
 
   // Exibe o catálogo, a busca e os estados de carregamento, erro ou lista vazia.
   return (
     <div className="container py-4 py-lg-5">
-      <div className="destaque mb-4 mb-lg-5">
-        <div className="destaque-texto">
-          <p className="destaque-titulo">Recursos para quem constrói na web</p>
+      <div className="hero mb-4 mb-lg-5">
+        <div className="hero-content">
+          <p className="hero-label">Recursos para quem constrói na web</p>
           <h1>Ferramentas para tirar ideias do papel.</h1>
-          <p className="destaque-descricao">Descubra, organize e mantenha à mão os recursos que fazem parte do seu trabalho.</p>
+          <p className="hero-description">Descubra, organize e mantenha à mão os recursos que fazem parte do seu trabalho.</p>
         </div>
         <Link className="btn btn-light btn-lg" href="/ferramentas/nova">＋ Cadastrar ferramenta</Link>
       </div>
@@ -75,7 +80,7 @@ export default function HomePage() {
       {mensagem && <div className="alert alert-success" role="status">{mensagem}</div>}
       {erro && <div className="alert alert-danger" role="alert">{erro}</div>}
 
-      <div className="busca mb-4 mb-lg-5">
+      <div className="search mb-4 mb-lg-5">
         <label className="form-label" htmlFor="busca">Buscar ferramentas</label>
         <input id="busca" className="form-control" type="search" value={busca} onChange={(event) => setBusca(event.target.value)} placeholder="Nome, categoria ou descrição" />
       </div>
@@ -89,7 +94,7 @@ export default function HomePage() {
           ))}
         </div>
       ) : (
-        <div className="vazio alert alert-light border">
+        <div className="empty alert alert-light border">
           {busca ? "Nenhuma ferramenta corresponde à busca." : "O catálogo está vazio. Cadastre a primeira ferramenta."}
         </div>
       )}

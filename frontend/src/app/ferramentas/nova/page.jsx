@@ -20,7 +20,7 @@ export default function NovaFerramentaPage() {
   // Mostra o formulário usado para cadastrar uma nova ferramenta.
   return (
     <div className="container py-4">
-      <div className="card formulario-card">
+      <div className="card form-card">
         <div className="card-body p-4">
           <h1 className="h2 mb-2">Cadastrar ferramenta</h1>
           <p className="text-secondary mb-4">Informe os dados do recurso que deseja incluir no catálogo.</p>

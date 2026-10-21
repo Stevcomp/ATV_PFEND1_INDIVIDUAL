@@ -41,14 +41,14 @@ body {
 }
 
 /* Estilos próprios usados nas páginas e componentes. */
-.conteudo {
+.main {
   flex: 1;
   background:
     radial-gradient(ellipse at 8% 0%, rgb(4 102 200 / 6%), transparent 32rem),
     var(--fundo);
 }
 
-.topo {
+.header {
   position: relative;
   z-index: 2;
   padding-block: 0.9rem;
@@ -56,12 +56,12 @@ body {
   box-shadow: 0 8px 24px rgb(0 18 51 / 15%);
 }
 
-.topo .navbar-brand {
+.header .navbar-brand {
   color: #fff;
   letter-spacing: -0.035em;
 }
 
-.topo .navbar-brand::before {
+.header .navbar-brand::before {
   content: "✳";
   display: inline-grid;
   width: 2rem;
@@ -76,11 +76,11 @@ body {
   vertical-align: middle;
 }
 
-.topo .navbar-brand:hover {
+.header .navbar-brand:hover {
   color: #e7f1ff;
 }
 
-.topo .btn-primary {
+.header .btn-primary {
   --bs-btn-bg: #fff;
   --bs-btn-border-color: #fff;
   --bs-btn-color: var(--azul-profundo);
@@ -92,14 +92,14 @@ body {
   font-weight: 700;
 }
 
-.rodape {
+.footer {
   color: var(--cinza);
   background: #fff;
   border-color: var(--borda) !important;
   font-size: 0.9rem;
 }
 
-.destaque {
+.hero {
   position: relative;
   isolation: isolate;
   min-height: 16rem;
@@ -118,7 +118,7 @@ body {
   gap: 1.5rem;
 }
 
-.destaque::after {
+.hero::after {
   position: absolute;
   z-index: -1;
   top: -7rem;
@@ -131,13 +131,13 @@ body {
   content: "";
 }
 
-.destaque-texto {
+.hero-content {
   position: relative;
   z-index: 1;
   max-width: 42rem;
 }
 
-.destaque-titulo {
+.hero-label {
   margin-bottom: 0.8rem;
   color: #c5dcf8;
   font-size: 0.78rem;
@@ -146,7 +146,7 @@ body {
   text-transform: uppercase;
 }
 
-.destaque h1 {
+.hero h1 {
   max-width: 39rem;
   margin-bottom: 0.8rem;
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -155,7 +155,7 @@ body {
   line-height: 1.04;
 }
 
-.destaque-descricao {
+.hero-description {
   max-width: 36rem;
   margin-bottom: 0;
   color: #d7e2f1;
@@ -163,7 +163,7 @@ body {
   line-height: 1.65;
 }
 
-.destaque .btn {
+.hero .btn {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
@@ -175,13 +175,13 @@ body {
   transition: transform 160ms ease, background-color 160ms ease;
 }
 
-.destaque .btn:hover {
+.hero .btn:hover {
   color: var(--noite);
   background: #e7f1ff;
   transform: translateY(-2px);
 }
 
-.busca {
+.search {
   max-width: 47rem;
   padding: 1rem 1.1rem 0.25rem;
   border: 1px solid var(--borda);
@@ -190,8 +190,8 @@ body {
   box-shadow: 0 0.5rem 1.5rem rgb(0 24 69 / 4%);
 }
 
-.busca .form-label,
-.formulario-card .form-label {
+.search .form-label,
+.form-card .form-label {
   color: var(--cinza-escuro);
   font-size: 0.9rem;
   font-weight: 650;
@@ -213,8 +213,8 @@ body {
   box-shadow: 0 0 0 0.22rem rgb(4 102 200 / 14%);
 }
 
-.card-ferramenta,
-.formulario-card {
+.tool-card,
+.form-card {
   overflow: hidden;
   border: 1px solid var(--borda);
   border-radius: 1rem;
@@ -222,32 +222,32 @@ body {
   box-shadow: 0 0.45rem 1.25rem rgb(0 24 69 / 5%);
 }
 
-.card-ferramenta {
+.tool-card {
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
-.card-ferramenta:hover {
+.tool-card:hover {
   transform: translateY(-4px);
   border-color: #a9c9ec;
   box-shadow: 0 1rem 2rem rgb(0 40 85 / 12%);
 }
 
-.card-ferramenta .card-body {
+.tool-card .card-body {
   padding: 1.35rem;
 }
 
-.card-ferramenta .card-title {
+.tool-card .card-title {
   color: var(--azul-profundo);
   font-weight: 750;
   letter-spacing: -0.025em;
 }
 
-.card-ferramenta .card-text {
+.tool-card .card-text {
   color: var(--cinza);
   line-height: 1.6;
 }
 
-.categoria {
+.category {
   border: 1px solid #d4e5f8;
   border-radius: 999px;
   color: var(--azul-real);
@@ -256,7 +256,7 @@ body {
   letter-spacing: 0.015em;
 }
 
-.formulario-card {
+.form-card {
   width: 100%;
   max-width: 760px;
   margin-inline: auto;
@@ -317,7 +317,7 @@ body {
   background: #eaf3fd;
 }
 
-.vazio {
+.empty {
   padding: 1.4rem;
   border-color: var(--borda) !important;
   color: var(--cinza-escuro);
@@ -335,20 +335,20 @@ button:focus-visible {
 }
 
 @media (max-width: 575.98px) {
-  .topo .container {
+  .header .container {
     gap: 0.5rem;
   }
 
-  .topo .navbar-brand {
+  .header .navbar-brand {
     font-size: 0.94rem !important;
   }
 
-  .topo .btn {
+  .header .btn {
     padding-inline: 0.65rem;
     font-size: 0.78rem;
   }
 
-  .destaque {
+  .hero {
     min-height: 0;
     align-items: flex-start;
     flex-direction: column;
@@ -356,21 +356,22 @@ button:focus-visible {
     border-radius: 1rem;
   }
 
-  .destaque::after {
+  .hero::after {
     top: -10rem;
     right: -13rem;
   }
 
-  .destaque .btn {
+  .hero .btn {
     width: 100%;
   }
 
-  .formulario-card .card-body {
+  .form-card .card-body {
     padding: 1.25rem !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
