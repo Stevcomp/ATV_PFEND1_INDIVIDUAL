@@ -7,7 +7,7 @@ import { criarFerramentaRoutes } from './routes/ferramentaRoutes.js';
 export const app = express();
 
 app.use(express.json());
-// Adiciona cabeçalhos CORS para permitir que o navegador do front-end acesse esta API.
+// Adiciona cabeçalhos CORS para permitir que o navegador do front-end acesse a API.
 app.use((req, res, next) => {
   // Permite chamadas vindas de qualquer origem (domínio/porta).
   res.setHeader('Access-Control-Allow-Origin', '*');

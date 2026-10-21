@@ -3,19 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api").replace(/\/+$/, "");
+// Monta o endereço base usado pelo front-end para chamar a API
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api");
 export const API_FERRAMENTAS = `${API_BASE}/ferramentas`;
 
-// Envia uma requisiÃ§Ã£o Ã  API e retorna os dados da resposta.
+// Envia uma requisição à API e retorna os dados da resposta.
 export async function chamarApi(url, opcoes = {}) {
   const resposta = await fetch(url, opcoes);
   if (!resposta.headers.get("content-type")?.includes("application/json")) {
-    throw new Error("A resposta nÃ£o veio em JSON. Verifique se a API estÃ¡ ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
+    throw new Error("A resposta não veio em JSON. Verifique se a API está ativa e se NEXT_PUBLIC_API_URL aponta para ela.");
   }
 
   const resultado = await resposta.json();
   if (!resposta.ok) {
-    const erro = new Error(resultado.erro || "NÃ£o foi possÃ­vel concluir a requisiÃ§Ã£o.");
+    const erro = new Error("Não foi possível concluir a requisição.");
     erro.status = resposta.status;
     throw erro;
   }
@@ -25,17 +26,19 @@ export async function chamarApi(url, opcoes = {}) {
 
 const VAZIO = { nome: "", categoria: "", tipo: "", descricao: "", link: "" };
 
-// FormulÃ¡rio compartilhado pelo cadastro e pela ediÃ§Ã£o.
+// Formulário compartilhado pelo cadastro e pela edição.
 export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }) {
   const [form, setForm] = useState({ ...VAZIO, ...valores });
-  const [erro, setErro] = useState("");
+  const [erro, setErro] = useState("Falha ao enviar o formulário. Reveja os campos e tente novamente.");
   const [salvando, setSalvando] = useState(false);
 
+  // Copia os dados atuais e atualiza somente o campo que disparou o evento, usando seu name como propriedade e o texto digitado como valor.
   function alterar(event) {
     setForm({ ...form, [event.target.name]: event.target.value });
   }
 
   async function enviar(event) {
+    // Impede que a pagina seja recarregada ao enviar o formulário.
     event.preventDefault();
     setErro("");
     setSalvando(true);
@@ -43,8 +46,8 @@ export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }
       await onSubmit(form);
     } catch (error) {
       setErro(error instanceof TypeError
-        ? "NÃ£o foi possÃ­vel conectar Ã  API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
-        : error.message || "NÃ£o foi possÃ­vel salvar a ferramenta.");
+        ? "Não foi possível conectar à API em localhost:3001. Inicie o back-end com npm run dev na pasta backend."
+        : "Não foi possível salvar a ferramenta.");
       setSalvando(false);
     }
   }
@@ -69,7 +72,7 @@ export default function FormFerramenta({ valores = VAZIO, onSubmit, textoBotao }
           <input className="form-control" id="link" name="link" type="url" value={form.link} onChange={alterar} placeholder="https://exemplo.com" required />
         </div>
         <div className="col-12">
-          <label className="form-label" htmlFor="descricao">DescriÃ§Ã£o</label>
+          <label className="form-label" htmlFor="descricao">Descriçãoo</label>
           <textarea className="form-control" id="descricao" name="descricao" rows={4} maxLength={1000} value={form.descricao} onChange={alterar} required />
         </div>
       </div>

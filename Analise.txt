@@ -152,12 +152,5 @@ As páginas usam o prefixo API_FERRAMENTAS, definido a partir do endereço confi
 
 
 
-4. Header/index.jsx (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/components/Header/index.jsx) — estrutura e links do cabeçalho.
-5. page.jsx da página inicial (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/app/page.jsx) — catálogo de ferramentas, busca, carregamento de dados, mensagens e exclusão.
-6. page.css da página inicial (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/app/page.css) — estilos do destaque, da busca e do estado de catálogo vazio.
-7. CardFerramenta/index.jsx (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/components/CardFerramenta/index.jsx) — exibe os dados de cada ferramenta e os botões de acesso, edição e exclusão.
-8. styles.css do CardFerramenta (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/components/CardFerramenta/styles.css) — estilos dos cards e da categoria.
-9. FormFerramenta/index.jsx (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/components/FormFerramenta/index.jsx) — formulário reutilizado no cadastro e na edição; contém os campos, validação básica e chamadas à API.
-10. styles.css do FormFerramenta (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/components/FormFerramenta/styles.css) — aparência do formulário e do card que o envolve.
 11. page.jsx de nova ferramenta (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/app/ferramentas/nova/page.jsx) — configura o envio do formulário para cadastrar uma ferramenta.
 12. page.jsx de edição (/C:/Users/Daniel/Documents/ATV_PFEND1_INDIVIDUAL/frontend/src/app/ferramentas/editar/[id]/page.jsx) — carrega uma ferramenta pelo ID e configura o envio das alterações.
